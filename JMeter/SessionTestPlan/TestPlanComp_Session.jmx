@@ -1,0 +1,874 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jmeterTestPlan version="1.2" properties="5.0" jmeter="5.5">
+  <hashTree>
+    <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="Test Plan" enabled="true">
+      <elementProp name="TestPlan.user_defined_variables" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
+        <collectionProp name="Arguments.arguments">
+          <elementProp name="home_dir" elementType="Argument">
+            <stringProp name="Argument.name">home_dir</stringProp>
+            <stringProp name="Argument.value">${__P(home_dir,)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="result_dir" elementType="Argument">
+            <stringProp name="Argument.name">result_dir</stringProp>
+            <stringProp name="Argument.value">${__P(result_dir,)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="run_number" elementType="Argument">
+            <stringProp name="Argument.name">run_number</stringProp>
+            <stringProp name="Argument.value">${__P(run_number,)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="threads" elementType="Argument">
+            <stringProp name="Argument.name">threads</stringProp>
+            <stringProp name="Argument.value">${__P(threads,)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="ramp_up" elementType="Argument">
+            <stringProp name="Argument.name">ramp_up</stringProp>
+            <stringProp name="Argument.value">${__P(ramp_up,)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="duration" elementType="Argument">
+            <stringProp name="Argument.name">duration</stringProp>
+            <stringProp name="Argument.value">${__P(duration,)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+        </collectionProp>
+      </elementProp>
+      <boolProp name="TestPlan.functional_mode">false</boolProp>
+      <boolProp name="TestPlan.serialize_threadgroups">false</boolProp>
+      <stringProp name="TestPlan.comments"></stringProp>
+      <stringProp name="TestPlan.user_define_classpath"></stringProp>
+    </TestPlan>
+    <hashTree>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Login" enabled="true">
+        <stringProp name="ThreadGroup.num_threads">${threads}</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">${ramp_up}</stringProp>
+        <stringProp name="ThreadGroup.duration">${duration}</stringProp>
+        <boolProp name="ThreadGroup.same_user_on_next_iteration">false</boolProp>
+        <boolProp name="ThreadGroup.scheduler">true</boolProp>
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <intProp name="LoopController.loops">-1</intProp>
+        </elementProp>
+        <stringProp name="ThreadGroup.delay"></stringProp>
+      </ThreadGroup>
+      <hashTree>
+        <CookieManager guiclass="CookiePanel" testclass="CookieManager" testname="HTTP Cookie Manager" enabled="true">
+          <collectionProp name="CookieManager.cookies"/>
+          <boolProp name="CookieManager.clearEachIteration">true</boolProp>
+          <boolProp name="CookieManager.controlledByThreadGroup">false</boolProp>
+        </CookieManager>
+        <hashTree/>
+        <com.blazemeter.jmeter.RandomCSVDataSetConfig guiclass="com.blazemeter.jmeter.RandomCSVDataSetConfigGui" testclass="com.blazemeter.jmeter.RandomCSVDataSetConfig" testname="CSV User Data" enabled="true">
+          <stringProp name="filename">${home_dir}/JMeter/shuffled_users.csv</stringProp>
+          <stringProp name="fileEncoding">UTF-8</stringProp>
+          <stringProp name="delimiter">,</stringProp>
+          <stringProp name="variableNames">company_id,user_id,company_email,name,password,role</stringProp>
+          <boolProp name="randomOrder">true</boolProp>
+          <boolProp name="ignoreFirstLine">true</boolProp>
+          <boolProp name="rewindOnTheEndOfList">false</boolProp>
+          <boolProp name="independentListPerThread">false</boolProp>
+          <stringProp name="TestPlan.comments">/home/joshubunut/JMeter/keycloak_users.csv , ${home_dir}/JMeter/keycloak_users.csv</stringProp>
+        </com.blazemeter.jmeter.RandomCSVDataSetConfig>
+        <hashTree/>
+        <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
+          <collectionProp name="HeaderManager.headers">
+            <elementProp name="" elementType="Header">
+              <stringProp name="Header.name">Content-Type</stringProp>
+              <stringProp name="Header.value">application/json</stringProp>
+            </elementProp>
+          </collectionProp>
+        </HeaderManager>
+        <hashTree/>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="HTTP Request: Login" enabled="true">
+          <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+            <collectionProp name="Arguments.arguments">
+              <elementProp name="" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">{&quot;companyEmail&quot;:&quot;${company_email}&quot;,&quot;password&quot;:&quot;${password}&quot;}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+            </collectionProp>
+          </elementProp>
+          <stringProp name="HTTPSampler.domain">localhost</stringProp>
+          <stringProp name="HTTPSampler.port">8081</stringProp>
+          <stringProp name="HTTPSampler.protocol">http</stringProp>
+          <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+          <stringProp name="HTTPSampler.path">/api/login</stringProp>
+          <stringProp name="HTTPSampler.method">POST</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.use_keepalive">false</boolProp>
+          <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+          <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+          <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+          <stringProp name="HTTPSampler.response_timeout"></stringProp>
+        </HTTPSamplerProxy>
+        <hashTree/>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="HTTP Request: Fetch Session Info" enabled="true">
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
+            <collectionProp name="Arguments.arguments"/>
+          </elementProp>
+          <stringProp name="HTTPSampler.domain">localhost</stringProp>
+          <stringProp name="HTTPSampler.port">8081</stringProp>
+          <stringProp name="HTTPSampler.protocol">http</stringProp>
+          <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+          <stringProp name="HTTPSampler.path">/api/session-info</stringProp>
+          <stringProp name="HTTPSampler.method">GET</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.use_keepalive">false</boolProp>
+          <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+          <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+          <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+          <stringProp name="HTTPSampler.response_timeout"></stringProp>
+        </HTTPSamplerProxy>
+        <hashTree/>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="HTTP Request: Fetch User Data" enabled="true">
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
+            <collectionProp name="Arguments.arguments"/>
+          </elementProp>
+          <stringProp name="HTTPSampler.domain">localhost</stringProp>
+          <stringProp name="HTTPSampler.port">8081</stringProp>
+          <stringProp name="HTTPSampler.protocol">http</stringProp>
+          <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+          <stringProp name="HTTPSampler.path">/api/users/${user_id}</stringProp>
+          <stringProp name="HTTPSampler.method">GET</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.use_keepalive">false</boolProp>
+          <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+          <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+          <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+          <stringProp name="HTTPSampler.response_timeout"></stringProp>
+        </HTTPSamplerProxy>
+        <hashTree/>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="HTTP Request: Fetch Company Data" enabled="true">
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
+            <collectionProp name="Arguments.arguments"/>
+          </elementProp>
+          <stringProp name="HTTPSampler.domain">localhost</stringProp>
+          <stringProp name="HTTPSampler.port">8081</stringProp>
+          <stringProp name="HTTPSampler.protocol">http</stringProp>
+          <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+          <stringProp name="HTTPSampler.path">/api/companies/${company_id}</stringProp>
+          <stringProp name="HTTPSampler.method">GET</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.use_keepalive">false</boolProp>
+          <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+          <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+          <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+          <stringProp name="HTTPSampler.response_timeout"></stringProp>
+        </HTTPSamplerProxy>
+        <hashTree/>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="HTTP Request: Fetch Available Courses" enabled="true">
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
+            <collectionProp name="Arguments.arguments"/>
+          </elementProp>
+          <stringProp name="HTTPSampler.domain">localhost</stringProp>
+          <stringProp name="HTTPSampler.port">8081</stringProp>
+          <stringProp name="HTTPSampler.protocol">http</stringProp>
+          <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+          <stringProp name="HTTPSampler.path">/api/companies/${company_id}/available-courses/${user_id}</stringProp>
+          <stringProp name="HTTPSampler.method">GET</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.use_keepalive">false</boolProp>
+          <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+          <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+          <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+          <stringProp name="HTTPSampler.response_timeout"></stringProp>
+        </HTTPSamplerProxy>
+        <hashTree/>
+        <JSR223Sampler guiclass="TestBeanGUI" testclass="JSR223Sampler" testname="JSR223 Prepare Course Book User" enabled="true">
+          <stringProp name="scriptLanguage">groovy</stringProp>
+          <stringProp name="parameters"></stringProp>
+          <stringProp name="filename"></stringProp>
+          <stringProp name="cacheKey">false</stringProp>
+          <stringProp name="script">import groovy.json.JsonSlurper
+import java.util.Random
+
+def retryFetchResponse(fetchFunc, maxRetries = 3, delayMillis = 1000) {
+    def response = null
+    for (int attempt = 1; attempt &lt;= maxRetries; attempt++) {
+        try {
+            response = fetchFunc()
+            if (response != null &amp;&amp; !response.isEmpty()) {
+                return response
+            }
+            log.warn(&quot;Retrying fetch response, attempt $attempt&quot;)
+            Thread.sleep(delayMillis)
+        } catch (InterruptedException e) {
+            SampleResult.setResponseCode(&quot;503&quot;)
+            SampleResult.setResponseMessage(&quot;Service Unavailable - Retry interrupted: &quot; + e.message)
+            return null
+        }
+    }
+    return response
+}
+
+def fetchAvailableCoursesResponse = { -&gt; prev.getResponseDataAsString() }
+def availableCoursesResponse = retryFetchResponse(fetchAvailableCoursesResponse)
+
+log.info(&quot;Response from Fetch Available Courses: &quot; + availableCoursesResponse)
+
+if (availableCoursesResponse == null || availableCoursesResponse.isEmpty()) {
+    SampleResult.setResponseCode(&quot;503&quot;)
+    SampleResult.setResponseMessage(&quot;Service Unavailable - No response received from Fetch Available Courses request&quot;)
+    // Clear previous booking data
+    vars.remove(&quot;bookRequestsSize&quot;)
+    (1..5).each { index -&gt;
+        vars.remove(&quot;bookRequestUrls_${index}&quot;)
+        vars.remove(&quot;bookRequestData_${index}&quot;) // Clear data as well
+    }
+    return
+}
+
+def parseJsonResponse(response) {
+    def jsonSlurper = new JsonSlurper()
+    try {
+        return jsonSlurper.parseText(response)
+    } catch (Exception e) {
+        log.error(&quot;Error parsing JSON response: &quot; + e.getMessage())
+        return null
+    }
+}
+
+def availableCourses = parseJsonResponse(availableCoursesResponse)
+
+if (availableCourses == null || availableCourses.isEmpty()) {
+    log.error(&quot;No available courses found in the JSON response.&quot;)
+    // Clear previous booking data
+    vars.remove(&quot;bookRequestsSize&quot;)
+    (1..5).each { index -&gt;
+        vars.remove(&quot;bookRequestUrls_${index}&quot;)
+        vars.remove(&quot;bookRequestData_${index}&quot;) // Clear data as well
+    }
+    return
+}
+
+log.info(&quot;Parsed available courses: &quot; + availableCourses)
+
+def random = new Random()
+def maxCoursesToBook = Math.min(availableCourses.size(), 5) // Limit to 5 or less
+def coursesToBookCount = random.nextInt(maxCoursesToBook + 1) // 0 to maxCoursesToBook
+log.info(&quot;Number of courses to book: &quot; + coursesToBookCount)
+
+def coursesToBook = []
+if (coursesToBookCount &gt; 0) {
+    def courseIndices = (0..&lt;availableCourses.size()).toList().sort { random.nextInt() }.take(coursesToBookCount)
+    log.info(&quot;Selected course indices for booking: &quot; + courseIndices)
+    courseIndices.each { index -&gt;
+        coursesToBook &lt;&lt; availableCourses[index]
+    }
+}
+
+if (coursesToBook.isEmpty()) {
+    log.info(&quot;No courses selected for booking.&quot;)
+    // Clear previous booking data
+    vars.remove(&quot;bookRequestsSize&quot;)
+    (1..5).each { index -&gt; 
+        vars.remove(&quot;bookRequestUrls_${index}&quot;)
+        vars.remove(&quot;bookRequestData_${index}&quot;) // Clear data as well
+    }
+    return
+}
+
+log.info(&quot;Selected courses for booking: &quot; + coursesToBook)
+
+// Clear previous booking data before setting new data
+(1..5).each { index -&gt; 
+    vars.remove(&quot;bookRequestUrls_${index}&quot;)
+    vars.remove(&quot;bookRequestData_${index}&quot;) // Clear data
+}
+
+
+// Initialize bookRequestUrls as an empty list before using it
+def bookRequestUrls = [] 
+
+// Modify the part where we store bookRequestUrls
+bookRequestUrls = coursesToBook.collect { course -&gt;
+   &quot;http://localhost:8081/api/users/${vars.get(&apos;user_id&apos;)}/book-course&quot;
+}
+
+// Store URLs and data as individual variables
+bookRequestUrls.eachWithIndex { url, index -&gt;
+    def data = &quot;{\&quot;courseId\&quot;: ${coursesToBook[index].courseId}}&quot;
+    vars.put(&quot;bookRequestUrls_${index + 1}&quot;, url)
+    vars.put(&quot;bookRequestData_${index + 1}&quot;, data)
+    log.info(&quot;Added bookRequestUrls_${index + 1}: &quot; + url)
+    log.info(&quot;Added bookRequestData_${index + 1}: &quot; + data)
+}
+// After setting bookRequestUrls
+vars.put(&quot;bookRequestsSize&quot;, bookRequestUrls.size().toString()) // Convert to String 
+log.info(&quot;bookRequestsSize: &quot; + vars.get(&quot;bookRequestsSize&quot;))
+</stringProp>
+        </JSR223Sampler>
+        <hashTree/>
+        <ForeachController guiclass="ForeachControlPanel" testclass="ForeachController" testname="ForEach Controller Book Course User" enabled="true">
+          <stringProp name="ForeachController.inputVal">bookRequestUrls_</stringProp>
+          <stringProp name="ForeachController.returnVal">current_url</stringProp>
+          <boolProp name="ForeachController.useSeparator">false</boolProp>
+          <stringProp name="ForeachController.startIndex">0</stringProp>
+        </ForeachController>
+        <hashTree>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="HTTP Request: Book Course User" enabled="true">
+            <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+              <collectionProp name="Arguments.arguments">
+                <elementProp name="" elementType="HTTPArgument">
+                  <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                  <stringProp name="Argument.value">${__V(bookRequestData_${__intSum(${__jm__ForEach Controller Book Course User__idx},1)})}</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+              </collectionProp>
+            </elementProp>
+            <stringProp name="HTTPSampler.domain">localhost</stringProp>
+            <stringProp name="HTTPSampler.port">8081</stringProp>
+            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+            <stringProp name="HTTPSampler.path">${current_url}</stringProp>
+            <stringProp name="HTTPSampler.method">POST</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">false</boolProp>
+            <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+            <boolProp name="HTTPSampler.use_keepalive">false</boolProp>
+            <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+            <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+            <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+            <stringProp name="HTTPSampler.response_timeout"></stringProp>
+          </HTTPSamplerProxy>
+          <hashTree/>
+        </hashTree>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="HTTP: Request: Fetch User Courses" enabled="true">
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
+            <collectionProp name="Arguments.arguments"/>
+          </elementProp>
+          <stringProp name="HTTPSampler.domain">localhost</stringProp>
+          <stringProp name="HTTPSampler.port">8081</stringProp>
+          <stringProp name="HTTPSampler.protocol">http</stringProp>
+          <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+          <stringProp name="HTTPSampler.path">/api/user-progress/${user_id}</stringProp>
+          <stringProp name="HTTPSampler.method">GET</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.use_keepalive">false</boolProp>
+          <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+          <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+          <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+          <stringProp name="HTTPSampler.response_timeout"></stringProp>
+        </HTTPSamplerProxy>
+        <hashTree/>
+        <JSR223Sampler guiclass="TestBeanGUI" testclass="JSR223Sampler" testname="JSR223 Prepare Course Progress User" enabled="true">
+          <stringProp name="scriptLanguage">groovy</stringProp>
+          <stringProp name="parameters"></stringProp>
+          <stringProp name="filename"></stringProp>
+          <stringProp name="cacheKey">false</stringProp>
+          <stringProp name="script">import groovy.json.JsonSlurper
+import java.util.Random
+
+def retryFetchResponse(fetchFunc, maxRetries = 3, delayMillis = 1000) {
+    def response = null
+    for (int attempt = 1; attempt &lt;= maxRetries; attempt++) {
+        try {
+            response = fetchFunc()
+            if (response != null &amp;&amp; !response.isEmpty()) {
+                return response
+            }
+            log.warn(&quot;Retrying fetch response, attempt $attempt&quot;)
+            Thread.sleep(delayMillis)
+        } catch (InterruptedException e) {
+            SampleResult.setResponseCode(&quot;503&quot;)
+            SampleResult.setResponseMessage(&quot;Service Unavailable - Retry interrupted: &quot; + e.message)
+            return null
+        }
+    }
+    return response
+}
+
+def clearPreviousData() {
+    vars.remove(&quot;patchRequestsSize&quot;)
+    (1..5).each { index -&gt;
+        vars.remove(&quot;patchRequestUrl_${index}&quot;)
+        vars.remove(&quot;patchRequestData_${index}&quot;)
+    }
+}
+
+def fetchUserCoursesResponse = { -&gt; prev.getResponseDataAsString() }
+def userCoursesResponse = retryFetchResponse(fetchUserCoursesResponse)
+
+log.info(&quot;Response from Fetch User Courses: &quot; + userCoursesResponse)
+
+if (userCoursesResponse == null || userCoursesResponse.isEmpty()) {
+    SampleResult.setResponseCode(&quot;503&quot;)
+    SampleResult.setResponseMessage(&quot;Service Unavailable - No response received from Fetch User Courses request&quot;)
+    clearPreviousData()
+    return
+}
+
+def parseJsonResponse(response) {
+    def jsonSlurper = new JsonSlurper()
+    try {
+        return jsonSlurper.parseText(response)
+    } catch (Exception e) {
+        log.error(&quot;Error parsing JSON response: &quot; + e.getMessage())
+        return null
+    }
+}
+
+def userCourses = parseJsonResponse(userCoursesResponse)
+
+if (userCourses == null || userCourses.isEmpty()) {
+    log.error(&quot;No user courses found in the JSON response.&quot;)
+    clearPreviousData()
+    return
+}
+
+log.info(&quot;Parsed user courses: &quot; + userCourses)
+
+def random = new Random()
+def maxCoursesToUpdate = Math.min(userCourses.size(), 5) // Limit to 5 or less
+def coursesToUpdateCount = random.nextInt(maxCoursesToUpdate )+ 2 // to maxCoursesToUpdate
+log.info(&quot;Number of courses to update: &quot; + coursesToUpdateCount)
+
+def coursesToUpdate = []
+if (coursesToUpdateCount &gt; 0) {
+    def courseIndices = (0..&lt;userCourses.size()).toList().sort { random.nextInt() }.take(coursesToUpdateCount)
+    log.info(&quot;Selected course indices for updating: &quot; + courseIndices)
+    courseIndices.each { index -&gt;
+        coursesToUpdate &lt;&lt; userCourses[index]
+    }
+}
+
+if (coursesToUpdate.isEmpty()) {
+    log.info(&quot;No courses selected for updating.&quot;)
+    clearPreviousData()
+    return
+}
+
+log.info(&quot;Selected courses for updating: &quot; + coursesToUpdate)
+
+// Clear previous data before setting new data
+clearPreviousData()
+
+coursesToUpdate.eachWithIndex { course, index -&gt;
+    def newProgress = Math.min(course.progress + random.nextInt(6), 100) // Increment progress by 0-5, max to 100
+    def url = &quot;http://localhost:8081/api/user-progress/${course.id}&quot;
+    def data = &quot;{\&quot;progress\&quot;: ${newProgress}}&quot;
+    vars.put(&quot;patchRequestUrl_${index + 1}&quot;, url)
+    vars.put(&quot;patchRequestData_${index + 1}&quot;, data)
+}
+
+vars.put(&quot;patchRequestsSize&quot;, coursesToUpdate.size().toString())
+
+log.info(&quot;patchRequestsSize: &quot; + vars.get(&quot;patchRequestsSize&quot;))
+coursesToUpdate.eachWithIndex { course, index -&gt;
+    log.info(&quot;patchRequestUrl_${index + 1}: &quot; + vars.get(&quot;patchRequestUrl_${index + 1}&quot;))
+    log.info(&quot;patchRequestData_${index + 1}: &quot; + vars.get(&quot;patchRequestData_${index + 1}&quot;))
+}</stringProp>
+        </JSR223Sampler>
+        <hashTree/>
+        <ForeachController guiclass="ForeachControlPanel" testclass="ForeachController" testname="ForEach ForEach Controller Progress Course User" enabled="true">
+          <stringProp name="ForeachController.inputVal">patchRequestUrl_</stringProp>
+          <stringProp name="ForeachController.returnVal">current_patch_url</stringProp>
+          <boolProp name="ForeachController.useSeparator">false</boolProp>
+          <stringProp name="ForeachController.startIndex">0</stringProp>
+        </ForeachController>
+        <hashTree>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="HTTP Request: Update Course Progress" enabled="true">
+            <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+              <collectionProp name="Arguments.arguments">
+                <elementProp name="" elementType="HTTPArgument">
+                  <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                  <stringProp name="Argument.value">${__V(patchRequestData_${__intSum(${__jm__ForEach ForEach Controller Progress Course User__idx},1)})}</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+              </collectionProp>
+            </elementProp>
+            <stringProp name="HTTPSampler.domain">localhost</stringProp>
+            <stringProp name="HTTPSampler.port">8081</stringProp>
+            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+            <stringProp name="HTTPSampler.path">${current_patch_url}</stringProp>
+            <stringProp name="HTTPSampler.method">PATCH</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">false</boolProp>
+            <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+            <boolProp name="HTTPSampler.use_keepalive">false</boolProp>
+            <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+            <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+            <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+            <stringProp name="HTTPSampler.response_timeout"></stringProp>
+          </HTTPSamplerProxy>
+          <hashTree/>
+          <ConstantTimer guiclass="ConstantTimerGui" testclass="ConstantTimer" testname="Progress Delay" enabled="true">
+            <stringProp name="ConstantTimer.delay">3000</stringProp>
+            <stringProp name="TestPlan.comments">IF want to simulate real time</stringProp>
+          </ConstantTimer>
+          <hashTree/>
+        </hashTree>
+        <IfController guiclass="IfControllerPanel" testclass="IfController" testname="IF Role" enabled="true">
+          <stringProp name="IfController.condition">${__groovy(vars.get(&apos;role&apos;) == &apos;TeamLeader&apos;)}</stringProp>
+          <boolProp name="IfController.evaluateAll">false</boolProp>
+          <boolProp name="IfController.useExpression">true</boolProp>
+        </IfController>
+        <hashTree>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="HTTP Request: Fetch Company Data Teamleader" enabled="true">
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
+              <collectionProp name="Arguments.arguments"/>
+            </elementProp>
+            <stringProp name="HTTPSampler.domain">localhost</stringProp>
+            <stringProp name="HTTPSampler.port">8081</stringProp>
+            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+            <stringProp name="HTTPSampler.path">/api/companies/${company_id}</stringProp>
+            <stringProp name="HTTPSampler.method">GET</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">false</boolProp>
+            <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+            <boolProp name="HTTPSampler.use_keepalive">false</boolProp>
+            <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+            <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+            <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+            <stringProp name="HTTPSampler.response_timeout"></stringProp>
+          </HTTPSamplerProxy>
+          <hashTree/>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="HTTP Request: Fetch Booked Courses Teamleader" enabled="true">
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
+              <collectionProp name="Arguments.arguments"/>
+            </elementProp>
+            <stringProp name="HTTPSampler.domain">localhost</stringProp>
+            <stringProp name="HTTPSampler.port">8081</stringProp>
+            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+            <stringProp name="HTTPSampler.path">/api/companies/${company_id}/booked-courses</stringProp>
+            <stringProp name="HTTPSampler.method">GET</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">false</boolProp>
+            <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+            <boolProp name="HTTPSampler.use_keepalive">false</boolProp>
+            <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+            <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+            <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+            <stringProp name="HTTPSampler.response_timeout"></stringProp>
+          </HTTPSamplerProxy>
+          <hashTree/>
+          <JSR223Sampler guiclass="TestBeanGUI" testclass="JSR223Sampler" testname="JSR223 Prepare Course Deletion Company" enabled="true">
+            <stringProp name="scriptLanguage">groovy</stringProp>
+            <stringProp name="parameters"></stringProp>
+            <stringProp name="filename"></stringProp>
+            <stringProp name="cacheKey">false</stringProp>
+            <stringProp name="script">import groovy.json.JsonSlurper
+import java.util.Random
+
+def clearPreviousData() {
+    vars.remove(&quot;deleteRequestsSize&quot;)
+    (1..5).each { index -&gt;
+        vars.remove(&quot;deleteRequestUrl_${index}&quot;)
+        vars.remove(&quot;deleteRequestData_${index}&quot;)
+    }
+}
+
+// Fetch the response data
+def fetchBookedCoursesResponse = prev.getResponseDataAsString()
+log.info(&quot;Response from Fetch Booked Courses: &quot; + fetchBookedCoursesResponse)
+
+if (fetchBookedCoursesResponse == null || fetchBookedCoursesResponse.isEmpty()) {
+    SampleResult.setResponseCode(&quot;503&quot;)
+    SampleResult.setResponseMessage(&quot;Service Unavailable - No response received from Fetch Booked Courses request&quot;)
+    clearPreviousData()
+    return
+}
+
+// Parse the JSON response
+def jsonSlurper = new JsonSlurper()
+def bookedCourses
+try {
+    bookedCourses = jsonSlurper.parseText(fetchBookedCoursesResponse)
+} catch (Exception e) {
+    log.error(&quot;Error parsing JSON response: &quot; + e.getMessage())
+    clearPreviousData()
+    return
+}
+
+if (bookedCourses == null || bookedCourses.isEmpty()) {
+    log.error(&quot;No booked courses found in the JSON response.&quot;)
+    clearPreviousData()
+    return
+}
+
+log.info(&quot;Parsed booked courses: &quot; + bookedCourses)
+
+def random = new Random()
+def maxCoursesToDelete = Math.min(bookedCourses.size(), 1) // Limit to 0 or 1
+def coursesToDeleteCount = random.nextInt(maxCoursesToDelete + 1) // 0 to maxCoursesToDelete
+log.info(&quot;Number of courses to delete: &quot; + coursesToDeleteCount)
+
+def coursesToDelete = []
+if (coursesToDeleteCount &gt; 0) {
+    def courseIndices = (0..&lt;bookedCourses.size()).toList().sort { random.nextInt() }.take(coursesToDeleteCount)
+    log.info(&quot;Selected course indices for deletion: &quot; + courseIndices)
+    courseIndices.each { index -&gt;
+        coursesToDelete &lt;&lt; bookedCourses[index]
+    }
+}
+
+if (coursesToDelete.isEmpty()) {
+    log.info(&quot;No courses selected for deletion.&quot;)
+    clearPreviousData()
+    return
+}
+
+log.info(&quot;Selected courses for deletion: &quot; + coursesToDelete)
+
+// Clear previous data before setting new data
+clearPreviousData()
+
+// Store URLs and body data as individual variables
+coursesToDelete.eachWithIndex { course, index -&gt;
+    def courseId = course.courseId
+    vars.put(&quot;deleteRequestUrl_${index + 1}&quot;, &quot;http://localhost:8081/api/companies/${vars.get(&apos;company_id&apos;)}/delete-course&quot;)
+    vars.put(&quot;deleteRequestData_${index + 1}&quot;, &quot;{\&quot;courseId\&quot;: ${courseId}}&quot;)
+}
+
+vars.put(&quot;deleteRequestsSize&quot;, coursesToDelete.size().toString())
+
+log.info(&quot;deleteRequestsSize: &quot; + vars.get(&quot;deleteRequestsSize&quot;))
+coursesToDelete.eachWithIndex { course, index -&gt;
+    log.info(&quot;deleteRequestUrl_${index + 1}: &quot; + vars.get(&quot;deleteRequestUrl_${index + 1}&quot;))
+    log.info(&quot;deleteRequestData_${index + 1}: &quot; + vars.get(&quot;deleteRequestData_${index + 1}&quot;))
+}</stringProp>
+          </JSR223Sampler>
+          <hashTree/>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="HTTP Request: Fetch Available Courses Company TeamLeder" enabled="true">
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
+              <collectionProp name="Arguments.arguments"/>
+            </elementProp>
+            <stringProp name="HTTPSampler.domain">localhost</stringProp>
+            <stringProp name="HTTPSampler.port">8081</stringProp>
+            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+            <stringProp name="HTTPSampler.path">api/companies/${company_id}/available-courses</stringProp>
+            <stringProp name="HTTPSampler.method">GET</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">false</boolProp>
+            <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+            <boolProp name="HTTPSampler.use_keepalive">false</boolProp>
+            <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+            <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+            <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+            <stringProp name="HTTPSampler.response_timeout"></stringProp>
+          </HTTPSamplerProxy>
+          <hashTree/>
+          <JSR223Sampler guiclass="TestBeanGUI" testclass="JSR223Sampler" testname="JSR223 Prepare Course Booking Company" enabled="true">
+            <stringProp name="scriptLanguage">groovy</stringProp>
+            <stringProp name="parameters"></stringProp>
+            <stringProp name="filename"></stringProp>
+            <stringProp name="cacheKey">false</stringProp>
+            <stringProp name="script">import groovy.json.JsonSlurper
+import java.util.Random
+
+def clearPreviousData() {
+    vars.remove(&quot;bookRequestsSizeCompany&quot;)
+    (1..5).each { index -&gt;
+        vars.remove(&quot;bookRequestUrlCompany_${index}&quot;)
+        vars.remove(&quot;bookRequestDataCompany_${index}&quot;)
+    }
+}
+
+// Fetch the response data
+def fetchAvailableCoursesResponse = prev.getResponseDataAsString()
+log.info(&quot;Response from Fetch Available Courses: &quot; + fetchAvailableCoursesResponse)
+
+if (fetchAvailableCoursesResponse == null || fetchAvailableCoursesResponse.isEmpty()) {
+    SampleResult.setResponseCode(&quot;503&quot;)
+    SampleResult.setResponseMessage(&quot;Service Unavailable - No response received from Fetch Available Courses request&quot;)
+    clearPreviousData()
+    return
+}
+
+// Parse the JSON response
+def jsonSlurper = new JsonSlurper()
+def availableCourses
+try {
+    availableCourses = jsonSlurper.parseText(fetchAvailableCoursesResponse)
+} catch (Exception e) {
+    log.error(&quot;Error parsing JSON response: &quot; + e.getMessage())
+    clearPreviousData()
+    return
+}
+
+if (availableCourses == null || availableCourses.isEmpty()) {
+    log.error(&quot;No available courses found in the JSON response.&quot;)
+    clearPreviousData()
+    return
+}
+
+log.info(&quot;Parsed available courses: &quot; + availableCourses)
+
+def random = new Random()
+def maxCoursesToBook = Math.min(availableCourses.size(), 2) // Limit to 2 or less
+def coursesToBookCount = random.nextInt(maxCoursesToBook + 1) // 0 to maxCoursesToBook
+log.info(&quot;Number of courses to book: &quot; + coursesToBookCount)
+
+def coursesToBook = []
+if (coursesToBookCount &gt; 0) {
+    def courseIndices = (0..&lt;availableCourses.size()).toList().sort { random.nextInt() }.take(coursesToBookCount)
+    log.info(&quot;Selected course indices for booking: &quot; + courseIndices)
+    courseIndices.each { index -&gt;
+        coursesToBook &lt;&lt; availableCourses[index]
+    }
+}
+
+if (coursesToBook.isEmpty()) {
+    log.info(&quot;No courses selected for booking.&quot;)
+    clearPreviousData()
+    return
+}
+
+log.info(&quot;Selected courses for booking: &quot; + coursesToBook)
+
+// Clear previous data before setting new data
+clearPreviousData()
+
+// Store URLs and body data as individual variables
+coursesToBook.eachWithIndex { course, index -&gt;
+    def courseId = course.courseId
+    vars.put(&quot;bookRequestUrlCompany_${index + 1}&quot;, &quot;http://localhost:8081/api/companies/${vars.get(&apos;company_id&apos;)}/book-course&quot;)
+    vars.put(&quot;bookRequestDataCompany_${index + 1}&quot;, &quot;{\&quot;courseId\&quot;: \&quot;${courseId}\&quot;}&quot;)
+}
+
+vars.put(&quot;bookRequestsSizeCompany&quot;, coursesToBook.size().toString())
+
+log.info(&quot;bookRequestsSizeCompany: &quot; + vars.get(&quot;bookRequestsSizeCompany&quot;))
+coursesToBook.eachWithIndex { course, index -&gt;
+    log.info(&quot;bookRequestUrlCompany_${index + 1}: &quot; + vars.get(&quot;bookRequestUrlCompany_${index + 1}&quot;))
+    log.info(&quot;bookRequestDataCompany_${index + 1}: &quot; + vars.get(&quot;bookRequestDataCompany_${index + 1}&quot;))
+}</stringProp>
+          </JSR223Sampler>
+          <hashTree/>
+          <ForeachController guiclass="ForeachControlPanel" testclass="ForeachController" testname="ForEach Controller Course Book Company" enabled="true">
+            <stringProp name="ForeachController.inputVal">bookRequestUrlCompany_</stringProp>
+            <stringProp name="ForeachController.returnVal">current_book_url_company</stringProp>
+            <boolProp name="ForeachController.useSeparator">false</boolProp>
+            <stringProp name="ForeachController.startIndex">0</stringProp>
+          </ForeachController>
+          <hashTree>
+            <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="HTTP Request: Book Course Company" enabled="true">
+              <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+              <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+                <collectionProp name="Arguments.arguments">
+                  <elementProp name="" elementType="HTTPArgument">
+                    <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                    <stringProp name="Argument.value">${__V(bookRequestDataCompany_${__intSum(${__jm__ForEach Controller Course Book Company__idx},1)})}</stringProp>
+                    <stringProp name="Argument.metadata">=</stringProp>
+                  </elementProp>
+                </collectionProp>
+              </elementProp>
+              <stringProp name="HTTPSampler.domain">localhost</stringProp>
+              <stringProp name="HTTPSampler.port">8081</stringProp>
+              <stringProp name="HTTPSampler.protocol">http</stringProp>
+              <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+              <stringProp name="HTTPSampler.path">${current_book_url_company}</stringProp>
+              <stringProp name="HTTPSampler.method">POST</stringProp>
+              <boolProp name="HTTPSampler.follow_redirects">false</boolProp>
+              <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+              <boolProp name="HTTPSampler.use_keepalive">false</boolProp>
+              <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+              <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+              <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+              <stringProp name="HTTPSampler.response_timeout"></stringProp>
+            </HTTPSamplerProxy>
+            <hashTree/>
+          </hashTree>
+          <ForeachController guiclass="ForeachControlPanel" testclass="ForeachController" testname="ForEach Controller Course Deletion Company" enabled="true">
+            <stringProp name="ForeachController.inputVal">deleteRequestUrl_</stringProp>
+            <stringProp name="ForeachController.returnVal">current_delete_url</stringProp>
+            <boolProp name="ForeachController.useSeparator">false</boolProp>
+            <stringProp name="ForeachController.startIndex">0</stringProp>
+          </ForeachController>
+          <hashTree>
+            <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="HTTP Request: Delete Course Company" enabled="true">
+              <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+              <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+                <collectionProp name="Arguments.arguments">
+                  <elementProp name="" elementType="HTTPArgument">
+                    <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                    <stringProp name="Argument.value">${__V(deleteRequestData_${__intSum(${__jm__ForEach Controller Course Deletion Company__idx},1)})}</stringProp>
+                    <stringProp name="Argument.metadata">=</stringProp>
+                  </elementProp>
+                </collectionProp>
+              </elementProp>
+              <stringProp name="HTTPSampler.domain">localhost</stringProp>
+              <stringProp name="HTTPSampler.port">8081</stringProp>
+              <stringProp name="HTTPSampler.protocol">http</stringProp>
+              <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+              <stringProp name="HTTPSampler.path">${current_delete_url}</stringProp>
+              <stringProp name="HTTPSampler.method">DELETE</stringProp>
+              <boolProp name="HTTPSampler.follow_redirects">false</boolProp>
+              <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+              <boolProp name="HTTPSampler.use_keepalive">false</boolProp>
+              <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+              <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+              <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+              <stringProp name="HTTPSampler.response_timeout"></stringProp>
+            </HTTPSamplerProxy>
+            <hashTree/>
+          </hashTree>
+        </hashTree>
+        <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree" enabled="false">
+          <boolProp name="ResultCollector.error_logging">false</boolProp>
+          <objProp>
+            <name>saveConfig</name>
+            <value class="SampleSaveConfiguration">
+              <time>true</time>
+              <latency>true</latency>
+              <timestamp>true</timestamp>
+              <success>true</success>
+              <label>true</label>
+              <code>true</code>
+              <message>true</message>
+              <threadName>true</threadName>
+              <dataType>true</dataType>
+              <encoding>false</encoding>
+              <assertions>true</assertions>
+              <subresults>true</subresults>
+              <responseData>false</responseData>
+              <samplerData>false</samplerData>
+              <xml>false</xml>
+              <fieldNames>true</fieldNames>
+              <responseHeaders>false</responseHeaders>
+              <requestHeaders>false</requestHeaders>
+              <responseDataOnError>false</responseDataOnError>
+              <saveAssertionResultsFailureMessage>true</saveAssertionResultsFailureMessage>
+              <assertionsResultsToSave>0</assertionsResultsToSave>
+              <bytes>true</bytes>
+              <sentBytes>true</sentBytes>
+              <url>true</url>
+              <threadCounts>true</threadCounts>
+              <idleTime>true</idleTime>
+              <connectTime>true</connectTime>
+            </value>
+          </objProp>
+          <stringProp name="filename"></stringProp>
+        </ResultCollector>
+        <hashTree/>
+      </hashTree>
+      <PostThreadGroup guiclass="PostThreadGroupGui" testclass="PostThreadGroup" testname="tearDown Thread Group" enabled="true">
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <stringProp name="LoopController.loops">1</stringProp>
+        </elementProp>
+        <stringProp name="ThreadGroup.num_threads">1</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">1</stringProp>
+        <boolProp name="ThreadGroup.scheduler">true</boolProp>
+        <stringProp name="ThreadGroup.duration">2</stringProp>
+        <stringProp name="ThreadGroup.delay"></stringProp>
+        <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
+      </PostThreadGroup>
+      <hashTree/>
+    </hashTree>
+  </hashTree>
+</jmeterTestPlan>

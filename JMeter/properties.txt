@@ -1,0 +1,27 @@
+jmeter.save.saveservice.timestamp_format=ms
+jmeter.reportgenerator.overall_granularity=10000
+
+jmeterengine.force.shutdown=false
+
+jmeter.reportgenerator.exporter.html.series_filter=^(?!.*(JSR223 Prepare Course Book User|JSR223 Prepare Course Progress User|JSR223 Prepare Course Deletion Company|JSR223 Prepare Course Booking Company|HTTP Request: Delete Course|HTTP Request: Fetch Session Info|Token Extractor)).*$
+
+# Custom Aggregated Latency Graph
+jmeter.reportgenerator.graph.custom_aggregatedLatency.classname=org.apache.jmeter.report.processor.graph.impl.CustomGraphConsumer
+jmeter.reportgenerator.graph.custom_aggregatedLatency.title=Aggregated Response Time (Latency)
+jmeter.reportgenerator.graph.custom_aggregatedLatency.property.set_Y_Axis=Aggregated Response Time in (ms) 
+jmeter.reportgenerator.graph.custom_aggregatedLatency.property.set_X_Axis=Time
+jmeter.reportgenerator.graph.custom_aggregatedLatency.property.set_granularity=10000
+jmeter.reportgenerator.graph.custom_aggregatedLatency.property.set_Sample_Variable_Name=Latency
+jmeter.reportgenerator.graph.custom_aggregatedLatency.property.set_Content_Message=Average Latency:
+jmeter.reportgenerator.graph.custom_aggregatedLatency.property.set_Sample_Label_Filter=^(?!.*(JSR223 Prepare Course Book User|JSR223 Prepare Course Progress User|JSR223 Prepare Course Deletion Company|JSR223 Prepare Course Booking Company|HTTP Request: Delete Course|HTTP Request: Fetch Session Info|Token Extractor)).*$ 
+
+
+# Custom Aggregated Response Time Graph
+jmeter.reportgenerator.graph.custom_aggregatedResponseTime.classname=org.apache.jmeter.report.processor.graph.impl.CustomGraphConsumer
+jmeter.reportgenerator.graph.custom_aggregatedResponseTime.title=Aggregated Response Time (Elapsed)
+jmeter.reportgenerator.graph.custom_aggregatedResponseTime.property.set_Y_Axis=Aggregated Response Time in (ms) 
+jmeter.reportgenerator.graph.custom_aggregatedResponseTime.property.set_X_Axis=Time
+jmeter.reportgenerator.graph.custom_aggregatedResponseTime.property.set_granularity=10000
+jmeter.reportgenerator.graph.custom_aggregatedResponseTime.property.set_Sample_Variable_Name=elapsed
+jmeter.reportgenerator.graph.custom_aggregatedResponseTime.property.set_Content_Message=Average Response Time:
+jmeter.reportgenerator.graph.custom_aggregatedResponseTime.property.set_Sample_Label_Filter=^(?!.*(JSR223 Prepare Course Book User|JSR223 Prepare Course Progress User|JSR223 Prepare Course Deletion Company|JSR223 Prepare Course Booking Company|HTTP Request: Delete Course|HTTP Request: Fetch Session Info|Token Extractor)).*$
