@@ -9,7 +9,6 @@ import java.util.Set;
 public class Company {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long companyId;
     private String name;
     @Column(unique = true)
@@ -18,14 +17,13 @@ public class Company {
     private Integer maxUser;
 
     @OneToMany(mappedBy = "company")
-    @JsonIgnore
-    private Set<Users> users;
+    @JsonIgnore // You no longer need this relationship for users
+    private Set<EnrolledEmployee> enrolledEmployees; // Relationship with EnrolledEmployee
 
     @OneToMany(mappedBy = "company")
     @JsonManagedReference
     private Set<CompanyCourse> companyCourses;
 
-    // Getters and setters
     public Long getCompanyId() {
         return companyId;
     }
@@ -66,17 +64,18 @@ public class Company {
         this.maxUser = maxUser;
     }
 
-    public Set<Users> getUsers() {
-        return users;
+    public Set<EnrolledEmployee> getEnrolledEmployees() {
+        return enrolledEmployees;
     }
 
-    public void setUsers(Set<Users> users) {
-        this.users = users;
+    public void setEnrolledEmployees(Set<EnrolledEmployee> enrolledEmployees) {
+        this.enrolledEmployees = enrolledEmployees;
     }
 
     public Set<CompanyCourse> getCompanyCourses() {
         return companyCourses;
     }
+
 
     public void setCompanyCourses(Set<CompanyCourse> companyCourses) {
         this.companyCourses = companyCourses;

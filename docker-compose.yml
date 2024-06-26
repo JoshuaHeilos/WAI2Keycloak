@@ -1,6 +1,26 @@
 version: '3.8'
 
 services:
+  keycloak:
+    image: quay.io/keycloak/keycloak:22.0.1
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      DB_VENDOR: POSTGRES
+      DB_ADDR: db
+      DB_DATABASE: mydatabase
+      DB_USER: postgres
+      DB_PASSWORD: secret
+    volumes:
+      - keycloak-data:/opt/keycloak/data
+    command: ["start-dev"]
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    networks:
+      - mynetwork
+
   db:
     image: postgres
     restart: always
@@ -11,7 +31,7 @@ services:
     volumes:
       - db-data:/var/lib/postgresql/data
     ports:
-      - "5433:5432"
+      - "5432:5432"
     networks:
       - mynetwork
 
@@ -27,9 +47,12 @@ services:
       SPRING_DATASOURCE_PASSWORD: secret
     depends_on:
       - db
+      - keycloak
     restart: always
     networks:
       - mynetwork
+    volumes:
+      - ./backend/keycloak_users.csv:/workspace/app/keycloak_users.csv
 
   frontend:
     build: ./frontend
@@ -59,6 +82,7 @@ services:
 volumes:
   db-data:
   pgadmin-data:
+  keycloak-data:
 
 networks:
   mynetwork:

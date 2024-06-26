@@ -13,11 +13,9 @@ public class EnrolledEmployee {
     @JoinColumn(name = "company_id")
     private Company company;
 
-    @ManyToOne
-    @JoinColumn(name = "users_id")
-    private Users users;
+    @Column(name = "keycloak_user_id") // Store the Keycloak user ID
+    private String keycloakUserId;
 
-    // Getters and setters
     public Long getId() {
         return id;
     }
@@ -34,12 +32,11 @@ public class EnrolledEmployee {
         this.company = company;
     }
 
-    public Users getUser() {
-        return users;
+    public String getKeycloakUserId() {
+        return keycloakUserId;
     }
 
-    public void setUser(Users users) {
-        this.users = users;
+    public void setKeycloakUserId(String keycloakUserId) {
+        this.keycloakUserId = keycloakUserId;
     }
-
 }

@@ -8,34 +8,43 @@ public class UserProgress {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long ProgressId;
 
-    @ManyToOne
-    @JoinColumn(name = "users_id")
-    @JsonIgnore // Add this annotation
-    private Users users;
+    @Column(name = "keycloak_user_id") // Store the Keycloak user ID
+    private String keycloakUserId;
 
     @ManyToOne
     @JoinColumn(name = "course_id")
     private Course course;
 
+    private Long companyId;
+
     private Integer progress;
 
-    // Getters and setters
-    public Long getId() {
-        return id;
+
+    public Long getCompanyId() {
+        return companyId;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setCompanyId(Long companyId) {
+        this.companyId = companyId;
     }
 
-    public Users getUser() {
-        return users;
+
+    public Long getProgressId() {
+        return ProgressId;
     }
 
-    public void setUser(Users users) {
-        this.users = users;
+    public void setProgressId(Long progressId) {
+        ProgressId = progressId;
+    }
+
+    public String getKeycloakUserId() {
+        return keycloakUserId;
+    }
+
+    public void setKeycloakUserId(String keycloakUserId) {
+        this.keycloakUserId = keycloakUserId;
     }
 
     public Course getCourse() {

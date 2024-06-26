@@ -19,6 +19,16 @@ public class CompanyCourse {
     @JoinColumn(name = "course_id")
     private Course course;
 
+
+    public CompanyCourse() {
+        // Default constructor required by JPA
+    }
+
+    public CompanyCourse(Company company, Course course) {
+        this.company = company;
+        this.course = course;
+    }
+
     // Getters and setters
     public Long getId() {
         return id;

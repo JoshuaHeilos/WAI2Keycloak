@@ -23,6 +23,8 @@ FROM openjdk:17-slim
 VOLUME /tmp
 # Copy the built jar file from the build stage
 COPY --from=build /workspace/app/target/*.jar app.jar
+# Copy the keycloak_users.csv file
+COPY keycloak_users.csv /workspace/app/keycloak_users.csv
 # Set the entrypoint to run the jar with increased heap size and JMX options
 ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-Dcom.sun.management.jmxremote=true","-Dcom.sun.management.jmxremote.port=9010","-Dcom.sun.management.jmxremote.rmi.port=9011","-Dcom.sun.management.jmxremote.authenticate=false","-Dcom.sun.management.jmxremote.ssl=false","-Djava.rmi.server.hostname=0.0.0.0","-Xms4g","-Xmx8g","-XX:MaxMetaspaceSize=512m","-XX:+UseG1GC","-XX:MaxGCPauseMillis=100","-XX:G1ReservePercent=20","-jar","/app.jar"]
 

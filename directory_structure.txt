@@ -1,6 +1,7 @@
 WAI2Keycloak/
 ├── backend
 │   ├── Dockerfile
+│   ├── keycloak_users.csv
 │   ├── mvnw
 │   ├── mvnw.cmd
 │   ├── pom.xml
@@ -12,40 +13,44 @@ WAI2Keycloak/
 │   │   │   │           └── backend
 │   │   │   │               ├── BackendApplication.java
 │   │   │   │               ├── config
+│   │   │   │               │   ├── CorsConfig.java
 │   │   │   │               │   ├── FilterConfig.java
+│   │   │   │               │   ├── JwtConverter.java
+│   │   │   │               │   ├── JwtConverterProperties.java
+│   │   │   │               │   ├── JwtDecoderConfig.java
+│   │   │   │               │   ├── JwtUserInfo.java
+│   │   │   │               │   ├── JwtUserInfoResolver.java
 │   │   │   │               │   ├── RequestLoggingFilter.java
 │   │   │   │               │   └── SecurityConfig.java
 │   │   │   │               ├── controller
-│   │   │   │               │   ├── AuthController.java
 │   │   │   │               │   ├── CompanyController.java
 │   │   │   │               │   ├── CourseController.java
-│   │   │   │               │   ├── UserProgressController.java
-│   │   │   │               │   └── UsersController.java
+│   │   │   │               │   └── UserProgressController.java
 │   │   │   │               ├── model
 │   │   │   │               │   ├── CompanyCourse.java
 │   │   │   │               │   ├── CompanyDTO.java
 │   │   │   │               │   ├── Company.java
 │   │   │   │               │   ├── Course.java
 │   │   │   │               │   ├── EnrolledEmployee.java
+│   │   │   │               │   ├── KeycloakUser.java
 │   │   │   │               │   ├── Role.java
-│   │   │   │               │   ├── SessionInfo.java
-│   │   │   │               │   ├── UserProgress.java
-│   │   │   │               │   └── Users.java
+│   │   │   │               │   └── UserProgress.java
 │   │   │   │               ├── repository
 │   │   │   │               │   ├── CompanyCourseRepository.java
 │   │   │   │               │   ├── CompanyRepository.java
 │   │   │   │               │   ├── CourseRepository.java
 │   │   │   │               │   ├── EnrolledEmployeeRepository.java
-│   │   │   │               │   ├── UserProgressRepository.java
-│   │   │   │               │   └── UsersRepository.java
+│   │   │   │               │   └── UserProgressRepository.java
 │   │   │   │               ├── service
+│   │   │   │               │   ├── AuthorizationService.java
 │   │   │   │               │   ├── CompanyService.java
 │   │   │   │               │   ├── CourseService.java
 │   │   │   │               │   ├── DataInitializer.java
-│   │   │   │               │   ├── UserProgressService.java
-│   │   │   │               │   └── UserService.java
+│   │   │   │               │   └── UserProgressService.java
 │   │   │   │               └── util
-│   │   │   │                   └── LoggerUtil.java
+│   │   │   │                   ├── JwtUtils.java
+│   │   │   │                   ├── LoggerUtil.java
+│   │   │   │                   └── UserInfo.java
 │   │   │   ├── main.iml
 │   │   │   └── resources
 │   │   │       └── application.properties
@@ -149,30 +154,35 @@ WAI2Keycloak/
 │   │   ├── components
 │   │   │   └── SessionInfo.vue
 │   │   ├── global.css
-│   │   ├── main.ts
-│   │   ├── shims-vue.d.ts
-│   │   ├── types
-│   │   │   ├── Company.ts
-│   │   │   └── Course.ts
+│   │   ├── keycloak.js
+│   │   ├── main.js
+│   │   ├── router
+│   │   │   └── index.js
+│   │   ├── store
+│   │   │   └── index.js
 │   │   └── views
 │   │       ├── CompanyDashboard.vue
 │   │       ├── CourseDashboard.vue
-│   │       ├── EmployeeDashboard.vue
-│   │       ├── LoginPage.vue
-│   │       └── RegisterPage.vue
+│   │       └── EmployeeDashboard.vue
 │   ├── tsconfig.json
 │   └── vue.config.js
 ├── JMeter
+│   ├── befehle.txt
 │   ├── download.py
+│   ├── KeyCloakTestPlan
+│   │   └── TestPlanComp_Keycloak.jmx
 │   ├── properties.txt
 │   ├── run_test.sh
 │   ├── SessionTestPlan
 │   │   └── TestPlanComp_Session.jmx
 │   └── shuffle_csv.sh
+├── Keycloak
+│   ├── create_user_keycloak.py
+│   └── Script_create_user.sh
 ├── mvnw
 ├── mvnw.cmd
 ├── package.json
 ├── package-lock.json
 └── README.md
 
-57 directories, 119 files
+60 directories, 126 files

@@ -1,10 +1,13 @@
 package com.example.backend.service;
 
 import com.example.backend.model.*;
-import com.example.backend.repository.CompanyRepository;
 import com.example.backend.repository.CompanyCourseRepository;
+import com.example.backend.repository.CompanyRepository;
 import com.example.backend.repository.CourseRepository;
 import com.example.backend.repository.UserProgressRepository;
+import com.example.backend.util.LoggerUtil;
+import com.example.backend.util.UserInfo;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,16 +31,11 @@ public class CompanyService {
     @Autowired
     private CourseRepository courseRepository;
 
+    @Autowired
+    private AuthorizationService authorizationService;
+
     public Optional<Company> findCompanyById(Long id) {
         return companyRepository.findById(id);
-    }
-
-    public List<Company> findAllCompanies() {
-        return companyRepository.findAll();
-    }
-
-    public void saveCompany(Company company) {
-        companyRepository.save(company);
     }
 
     public List<CompanyDTO> findAllCompanyDTOs() {
@@ -46,23 +44,23 @@ public class CompanyService {
                 .collect(Collectors.toList());
     }
 
-    private CompanyDTO convertToDTO(Company company) {
-        CompanyDTO dto = new CompanyDTO();
-        dto.setCompanyId(company.getCompanyId());
-        dto.setName(company.getName());
-        dto.setCompanyEmailEnding(company.getCompanyEmailEnding());
-        dto.setRegisterUser(company.getRegisterUser());
-        dto.setMaxUser(company.getMaxUser());
-        return dto;
+    public void saveCompany(Company company) {
+        companyRepository.save(company);
     }
 
-    public List<Course> getAvailableCoursesForUser(Long companyId, Long userId) {
-        Company company = companyRepository.findById(companyId).orElseThrow(() -> new RuntimeException("Company not found"));
-        List<UserProgress> userProgressList = userProgressRepository.findByUsersUserId(userId);
-        Set<Long> userCourseIds = userProgressList.stream().map(up -> up.getCourse().getCourseId()).collect(Collectors.toSet());
+    public List<Course> getAvailableCoursesForUser(Long companyId, String keycloakUserId) {
+        Company company = companyRepository.findById(companyId)
+                .orElseThrow(() -> new RuntimeException("Company not found"));
+
+        List<UserProgress> userProgressList = userProgressRepository.findByKeycloakUserId(keycloakUserId);
+        Set<Long> userCourseIds = userProgressList.stream()
+                .map(up -> up.getCourse().getCourseId())
+                .collect(Collectors.toSet());
 
         List<CompanyCourse> companyCourses = companyCourseRepository.findByCompany(company);
-        Set<Long> companyCourseIds = companyCourses.stream().map(cc -> cc.getCourse().getCourseId()).collect(Collectors.toSet());
+        Set<Long> companyCourseIds = companyCourses.stream()
+                .map(cc -> cc.getCourse().getCourseId())
+                .collect(Collectors.toSet());
 
         return courseRepository.findAll().stream()
                 .filter(course -> !userCourseIds.contains(course.getCourseId()) && companyCourseIds.contains(course.getCourseId()))
@@ -70,9 +68,12 @@ public class CompanyService {
     }
 
     public List<Course> getAvailableCourses(Long companyId) {
-        Company company = companyRepository.findById(companyId).orElseThrow(() -> new RuntimeException("Company not found"));
+        Company company = companyRepository.findById(companyId)
+                .orElseThrow(() -> new RuntimeException("Company not found"));
         List<CompanyCourse> companyCourses = companyCourseRepository.findByCompany(company);
-        Set<Long> companyCourseIds = companyCourses.stream().map(cc -> cc.getCourse().getCourseId()).collect(Collectors.toSet());
+        Set<Long> companyCourseIds = companyCourses.stream()
+                .map(cc -> cc.getCourse().getCourseId())
+                .collect(Collectors.toSet());
 
         return courseRepository.findAll().stream()
                 .filter(course -> !companyCourseIds.contains(course.getCourseId()))
@@ -80,7 +81,8 @@ public class CompanyService {
     }
 
     public List<Course> getBookedCourses(Long companyId) {
-        Company company = companyRepository.findById(companyId).orElseThrow(() -> new RuntimeException("Company not found"));
+        Company company = companyRepository.findById(companyId)
+                .orElseThrow(() -> new RuntimeException("Company not found"));
         List<CompanyCourse> companyCourses = companyCourseRepository.findByCompany(company);
         return companyCourses.stream()
                 .map(CompanyCourse::getCourse)
@@ -88,10 +90,11 @@ public class CompanyService {
     }
 
     public CompanyCourse bookCourseForCompany(Long companyId, Long courseId) {
-        Company company = companyRepository.findById(companyId).orElseThrow(() -> new RuntimeException("Company not found"));
-        Course course = courseRepository.findById(courseId).orElseThrow(() -> new RuntimeException("Course not found"));
+        Company company = companyRepository.findById(companyId)
+                .orElseThrow(() -> new RuntimeException("Company not found"));
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new RuntimeException("Course not found"));
 
-        // Check if the course is already booked by the company
         boolean alreadyBooked = companyCourseRepository.findByCompany(company).stream()
                 .anyMatch(cc -> cc.getCourse().getCourseId().equals(courseId));
 
@@ -105,22 +108,52 @@ public class CompanyService {
         return companyCourseRepository.save(companyCourse);
     }
 
+    @Transactional
     public void deleteCourseForCompany(Long companyId, Long courseId) {
-        Company company = companyRepository.findById(companyId).orElseThrow(() -> new RuntimeException("Company not found"));
-        Course course = courseRepository.findById(courseId).orElseThrow(() -> new RuntimeException("Course not found"));
+        Company company = companyRepository.findById(companyId)
+                .orElseThrow(() -> new RuntimeException("Company not found"));
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new RuntimeException("Course not found"));
 
-        CompanyCourse companyCourse = companyCourseRepository.findByCompany(company).stream()
-                .filter(cc -> cc.getCourse().getCourseId().equals(courseId))
-                .findFirst()
+        CompanyCourse companyCourse = companyCourseRepository.findByCompanyCompanyIdAndCourseCourseId(companyId, courseId)
                 .orElseThrow(() -> new RuntimeException("Course not booked by the company"));
 
-        // Remove the course from booked courses
         companyCourseRepository.delete(companyCourse);
 
-        // Remove progress records for this course for all employees of the company
-        List<UserProgress> userProgressList = userProgressRepository.findAll().stream()
-                .filter(up -> up.getCourse().getCourseId().equals(courseId) && up.getUser().getCompany().getCompanyId().equals(companyId))
-                .collect(Collectors.toList());
+        // Delete all UserProgress entries for this course and company
+        List<UserProgress> userProgressList = userProgressRepository.findByCourse_CourseIdAndCompanyId(courseId, companyId);
         userProgressRepository.deleteAll(userProgressList);
+
+        // Remove the course from the company's set of courses
+        company.getCompanyCourses().removeIf(cc -> cc.getCourse().getCourseId().equals(courseId));
+        companyRepository.save(company);
     }
+
+
+
+    public boolean isUserAuthorizedForCompany(UserInfo userInfo, Long companyId) {
+        return authorizationService.isUserAuthorizedForCompany(userInfo, companyId);
+    }
+
+    public boolean isUserTeamLeader(UserInfo userInfo) {
+        return authorizationService.isUserTeamLeader(userInfo);
+    }
+
+    public boolean isUserAdmin(UserInfo userInfo) {
+        return authorizationService.isUserAdmin(userInfo);
+    }
+
+
+    private CompanyDTO convertToDTO(Company company) {
+        CompanyDTO dto = new CompanyDTO();
+        dto.setCompanyId(company.getCompanyId());
+        dto.setName(company.getName());
+        dto.setCompanyEmailEnding(company.getCompanyEmailEnding());
+        dto.setRegisterUser(company.getRegisterUser());
+        dto.setMaxUser(company.getMaxUser());
+        return dto;
+    }
+
+
+
 }

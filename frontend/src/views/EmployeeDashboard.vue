@@ -1,41 +1,34 @@
 <template>
   <div class="main-content">
-    <div class="nav-buttons">
-      <button @click="goToCompanyDashboard">Go to Company Dashboard</button>
-      <button @click="goToCourseDashboard">Go to Course Dashboard</button>
-    </div>
+    <button v-if="isTeamLeader" @click="goToCompanyDashboard">Go to Company Dashboard</button>
+    <button v-if="isAdmin" @click="goToCourseDashboard">Go to Course Dashboard</button>
+
     <h1>Employee Dashboard</h1>
-    <div v-if="user && company">
+
+    <p v-if="!keycloak.authenticated">Please log in to view this page.</p>
+
+    <div v-else-if="user && company">
+      <p>Welcome, {{ keycloak.tokenParsed.preferred_username }}!</p>
       <p>Company: {{ company.name }}</p>
-      <p>User: {{ user.name }}</p>
-      <p>Email: {{ user.companyEmail }}</p>
-      <p>Password: {{ user.password }}</p>
-      <h2>Courses</h2>
+      <p>Role: {{ role }}</p>
+
+      <h2>Your Courses</h2>
       <ul>
-        <li v-for="courseProgress in courses" :key="courseProgress.courseId">
+        <li v-for="courseProgress in courses" :key="courseProgress.id">
           {{ courseProgress.courseName }} - Progress: {{ courseProgress.progress }}%
-          <button @click="incrementProgress(courseProgress)">Increment Progress</button>
+          <button @click="incrementProgress(courseProgress.id)">Increment Progress</button>
         </li>
       </ul>
+
       <h2>Available Courses</h2>
       <ul>
         <li v-for="course in availableCourses" :key="course.courseId">
           {{ course.name }} - {{ course.description }}
-          <button @click="bookCourse(course)">Book Course</button>
+          <button @click="bookCourse(course.courseId)">Book Course</button>
         </li>
       </ul>
-      <h2>Update Info</h2>
-      <div>
-        <label for="name">Name:</label>
-        <input id="name" v-model="updatedName" placeholder="Enter new name" />
-        <button @click="updateUserName">Update Name</button>
-      </div>
-      <div>
-        <label for="password">Password:</label>
-        <input id="password" type="password" v-model="updatedPassword" placeholder="Enter new password" />
-        <button @click="updateUserPassword">Update Password</button>
-      </div>
     </div>
+
     <div v-else>
       <p>Loading...</p>
     </div>
@@ -43,6 +36,8 @@
 </template>
 
 <script>
+import keycloak from '@/keycloak';
+
 export default {
   data() {
     return {
@@ -50,232 +45,172 @@ export default {
       company: null,
       courses: [],
       availableCourses: [],
-      updatedName: '',
-      updatedPassword: '',
-      role: ''
+      role: '',
+      loading: true,
     };
   },
+  computed: {
+    isAdmin() {
+      return this.role === 'Admin';
+    },
+    isTeamLeader() {
+      return this.role === 'TeamLeader';
+    }
+  },
   created() {
-    this.fetchSessionInfo();
+    if (!keycloak.authenticated) {
+      keycloak.login();
+      return;
+    }
+    keycloak.loadUserInfo()
+        .then(userInfo => {
+          this.role = userInfo.role;
+          this.fetchInitialData();
+        })
+        .catch(error => {
+          console.error('Failed to load user info:', error);
+          this.loading = false;
+        });
   },
   methods: {
-    fetchSessionInfo() {
-      const requestInfo = {
-        url: 'http://localhost:8081/api/session-info',
-        method: 'GET',
-        headers: {}
-      };
-      this.$emit('request-info-updated', requestInfo);
-
-      fetch(requestInfo.url, {
-        method: requestInfo.method,
-        credentials: 'include'
-      })
-          .then(response => response.json())
-          .then(data => {
-            sessionStorage.setItem('sessionId', data.sessionId);
-            sessionStorage.setItem('userId', data.userId);
-            sessionStorage.setItem('role', data.role);
-            sessionStorage.setItem('companyId', data.companyId);
-            this.role = data.role;
-            this.fetchUserData(data.userId);
-            this.fetchCompanyData(data.companyId);
-            this.fetchUserCourses(data.userId);
-            this.fetchAvailableCourses(data.companyId, data.userId);
-          })
-          .catch(error => {
-            console.error('Error fetching session info:', error);
+    fetchInitialData() {
+      this.fetchUserData()
+          .then(() => this.fetchCompanyData())
+          .then(() => this.fetchUserCourses())
+          .then(() => this.fetchAvailableCourses())
+          .finally(() => {
+            this.loading = false;
           });
     },
-    fetchUserData(userId) {
-      const requestInfo = {
-        url: `http://localhost:8081/api/users/${userId}`,
-        method: 'GET',
-        headers: {}
-      };
-      this.$emit('request-info-updated', requestInfo);
 
-      fetch(requestInfo.url, {
-        method: requestInfo.method,
-        credentials: 'include'
+    fetchUserData() {
+      return fetch(`http://localhost:8081/api/users/${keycloak.tokenParsed.sub}`, {
+        method: 'GET',
+        headers: {'Authorization': `Bearer ${keycloak.token}`}
       })
-          .then(response => response.json())
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Error fetching user data');
+            }
+            return response.json();
+          })
           .then(data => {
             this.user = data;
-            this.updatedName = data.name;
-            this.updatedPassword = data.password;
-          })
-          .catch(error => {
-            console.error('Error fetching user info:', error);
           });
     },
-    fetchCompanyData(companyId) {
-      const requestInfo = {
-        url: `http://localhost:8081/api/companies/${companyId}`,
+    fetchCompanyData() {
+      return fetch(`http://localhost:8081/api/companies/${keycloak.tokenParsed.companyId}`, {
         method: 'GET',
-        headers: {}
-      };
-      this.$emit('request-info-updated', requestInfo);
-
-      fetch(requestInfo.url, {
-        method: requestInfo.method,
-        credentials: 'include'
+        headers: {'Authorization': `Bearer ${keycloak.token}`}
       })
-          .then(response => response.json())
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Error fetching company data');
+            }
+            return response.json();
+          })
           .then(data => {
             this.company = data;
-          })
-          .catch(error => {
-            console.error('Error fetching company data:', error);
           });
     },
-    fetchUserCourses(userId) {
-      const requestInfo = {
-        url: `http://localhost:8081/api/user-progress/${userId}`,
-        method: 'GET',
-        headers: {}
-      };
-      this.$emit('request-info-updated', requestInfo);
 
-      fetch(requestInfo.url, {
-        method: requestInfo.method,
-        credentials: 'include'
+    fetchUserCourses() {
+      return fetch(`http://localhost:8081/api/user-progress/${keycloak.tokenParsed.sub}`, {
+        method: 'GET',
+        headers: {'Authorization': `Bearer ${keycloak.token}`}
       })
-          .then(response => response.json())
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Error fetching user courses');
+            }
+            return response.json();
+          })
           .then(data => {
-            console.log('User courses data:', data);  // Log the received data
             this.courses = data;
-          })
-          .catch(error => {
-            console.error('Error fetching user courses:', error);
           });
     },
-    fetchAvailableCourses(companyId, userId) {
-      const requestInfo = {
-        url: `http://localhost:8081/api/companies/${companyId}/available-courses/${userId}`,
-        method: 'GET',
-        headers: {}
-      };
-      this.$emit('request-info-updated', requestInfo);
 
-      fetch(requestInfo.url, {
-        method: requestInfo.method,
-        credentials: 'include'
+    fetchAvailableCourses() {
+      return fetch(`http://localhost:8081/api/companies/${keycloak.tokenParsed.companyId}/available-courses/${keycloak.tokenParsed.sub}`, {
+        method: 'GET',
+        headers: {'Authorization': `Bearer ${keycloak.token}`}
       })
-          .then(response => response.json())
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Error fetching available courses');
+            }
+            return response.json();
+          })
           .then(data => {
             this.availableCourses = data;
-          })
-          .catch(error => {
-            console.error('Error fetching available courses:', error);
           });
     },
-    updateUserName() {
-      const userId = sessionStorage.getItem('userId');
-      const updatedData = { name: this.updatedName };
-      const requestInfo = {
-        url: `http://localhost:8081/api/users/${userId}`,
+    incrementProgress(progressId) {
+      fetch(`http://localhost:8081/api/user-progress/${progressId}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        data: updatedData
-      };
-      this.$emit('request-info-updated', requestInfo);
-
-      fetch(requestInfo.url, {
-        method: requestInfo.method,
-        headers: requestInfo.headers,
-        body: JSON.stringify(requestInfo.data),
-        credentials: 'include'
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${keycloak.token}`
+        },
+        body: JSON.stringify({progress: this.courses.find(c => c.id === progressId).progress + 1})
       })
-          .then(response => response.json())
-          .then(data => {
-            this.user.name = data.name;
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Error updating course progress');
+            }
+            return response.json();
+          })
+          .then(updatedProgress => {
+            // Update the progress in the local courses data
+            const courseIndex = this.courses.findIndex(c => c.id === progressId);
+            if (courseIndex > -1) {
+              this.courses[courseIndex] = updatedProgress;
+            }
           })
           .catch(error => {
-            console.error('Error updating user name:', error);
+            console.error('Error updating course progress:', error);
+            // Handle the error appropriately (e.g., show an error message to the user)
           });
     },
-    updateUserPassword() {
-      const userId = sessionStorage.getItem('userId');
-      const updatedData = { password: this.updatedPassword };
-      const requestInfo = {
-        url: `http://localhost:8081/api/users/${userId}`,
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        data: updatedData
-      };
-      this.$emit('request-info-updated', requestInfo);
-
-      fetch(requestInfo.url, {
-        method: requestInfo.method,
-        headers: requestInfo.headers,
-        body: JSON.stringify(requestInfo.data),
-        credentials: 'include'
-      })
-          .then(response => response.json())
-          .then(data => {
-            this.user.password = data.password;
-          })
-          .catch(error => {
-            console.error('Error updating user password:', error);
-          });
-    },
-    incrementProgress(courseProgress) {
-      if (courseProgress.progress < 100) {
-        const updatedProgress = courseProgress.progress + 1;
-        const requestInfo = {
-          url: `http://localhost:8081/api/user-progress/${courseProgress.id}`,
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          data: { progress: updatedProgress }
-        };
-        this.$emit('request-info-updated', requestInfo);
-
-        fetch(requestInfo.url, {
-          method: requestInfo.method,
-          headers: requestInfo.headers,
-          body: JSON.stringify(requestInfo.data),
-          credentials: 'include'
-        })
-            .then(response => response.json())
-            .then(data => {
-              courseProgress.progress = data.progress;
-            })
-            .catch(error => {
-              console.error('Error updating course progress:', error);
-            });
-      }
-    },
-    bookCourse(course) {
-      const userId = sessionStorage.getItem('userId');
-      const requestInfo = {
-        url: `http://localhost:8081/api/users/${userId}/book-course`,
+    bookCourse(courseId) {
+      fetch(`http://localhost:8081/api/users/${keycloak.tokenParsed.sub}/book-course`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        data: { courseId: course.courseId }
-      };
-      this.$emit('request-info-updated', requestInfo);
-
-      fetch(requestInfo.url, {
-        method: requestInfo.method,
-        headers: requestInfo.headers,
-        body: JSON.stringify(requestInfo.data),
-        credentials: 'include'
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${keycloak.token}`
+        },
+        body: JSON.stringify({courseId: courseId})
       })
-          .then(response => response.json())
+          .then(response => {
+            if (!response.ok) {
+              return response.text().then(text => {
+                throw new Error(text);
+              });
+            }
+            return response.json();
+          })
           .then(data => {
-            this.courses.push(data); // Add the newly booked course to the user's courses
-            this.availableCourses = this.availableCourses.filter(c => c.courseId !== course.courseId); // Remove the booked course from the available courses
+            this.courses.push(data);
+            this.availableCourses = this.availableCourses.filter(c => c.courseId !== courseId);
           })
           .catch(error => {
             console.error('Error booking course:', error);
           });
     },
     goToCompanyDashboard() {
-      this.$router.push('/company-dashboard');
+      if (this.isTeamLeader) { // Check if the user is a TeamLeader
+        this.$router.push('/company-dashboard');
+      } else {
+        // Handle unauthorized access (e.g., display an error message)
+      }
     },
+
     goToCourseDashboard() {
-      this.$router.push('/course-dashboard');
+      if (this.isAdmin) { // Check if the user is an Admin
+        this.$router.push('/course-dashboard');
+      } else {
+        // Handle unauthorized access (e.g., display an error message)
+      }
     }
   }
 };
